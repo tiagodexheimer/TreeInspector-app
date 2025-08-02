@@ -45,7 +45,30 @@ TreeInspector/
 - Redis
 - Docker e Docker Compose (opcional)
 
-### Instalação
+### Instalação Automática
+
+#### Windows
+```cmd
+# Clone o repositório
+git clone https://github.com/seu-usuario/treeinspector-app.git
+cd treeinspector-app
+
+# Execute o script de setup
+scripts\setup.bat
+```
+
+#### Linux/macOS
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/treeinspector-app.git
+cd treeinspector-app
+
+# Torne o script executável e execute
+chmod +x scripts/setup.sh
+./scripts/setup.sh
+```
+
+### Instalação Manual
 
 1. **Clone o repositório**
 ```bash
@@ -87,15 +110,23 @@ npx react-native run-android  # ou run-ios
 
 ### Configuração do Banco de Dados
 
+#### Com Docker (Recomendado)
+```bash
+# Iniciar PostgreSQL e Redis
+docker-compose up -d postgres redis
+
+# Aguardar inicialização e executar schema
+docker-compose exec -T postgres psql -U treeinspector -d treeinspector < database/schema.sql
+```
+
+#### Manual
 ```bash
 # Criar banco e extensões
 createdb treeinspector
 psql treeinspector -c "CREATE EXTENSION postgis;"
 
-# Executar migrações
-cd backend
-npm run migrate
-npm run seed
+# Executar schema
+psql treeinspector < database/schema.sql
 ```
 
 ## 📱 Aplicação Móvel
@@ -140,37 +171,6 @@ npm run seed
 
 ### Modelo Temporal
 
-O sistema implementa um modelo **bitemporal** que preserva:
-
-- **Tempo Válido**: Quando o fato era verdadeiro no mundo real
-- **Tempo de Transação**: Quando foi registrado no sistema
-
-### Principais Tabelas
-
-- `arvores` - Dados básicos das árvores
-- `especies` - Catálogo de espécies
-- `inspecoes` - Registros de inspeções
-- `dados_dendrometricos` - Medições temporais
-- `dados_fitossanitarios` - Estados de saúde temporais
-- `avaliacoes_risco` - Avaliações de risco temporais
-
-## 🔌 API REST
-
-### Endpoints Principais
-
-```
-POST   /api/auth/login              # Autenticação
-GET    /api/trees                   # Listar árvores
-POST   /api/inspections             # Nova inspeção
-POST   /api/species/identify        # Identificar espécie
-POST   /api/sync/upload             # Sincronizar dados
-GET    /api/reports/generate        # Gerar relatório
-```
-
-### Autenticação
-
-```bash
-# Login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "senha": "password"}'
