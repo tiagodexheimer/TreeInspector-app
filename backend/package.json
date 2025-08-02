@@ -13,9 +13,9 @@
     "lint": "eslint src/ --ext .js",
     "lint:fix": "eslint src/ --ext .js --fix",
     "format": "prettier --write \"src/**/*.js\"",
-    "migrate": "node src/database/migrate.js",
+    "migrate": "npx sequelize-cli db:migrate --env development",
     "migrate:rollback": "node src/database/rollback.js",
-    "seed": "node src/database/seed.js",
+    "seed": "npx sequelize-cli db:seed:all --env development",
     "db:reset": "npm run migrate:rollback && npm run migrate && npm run seed",
     "docs": "swagger-jsdoc -d swaggerDef.js src/routes/*.js -o docs/swagger.json"
   },
