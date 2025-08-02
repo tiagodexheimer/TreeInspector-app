@@ -19,21 +19,59 @@ REM Verificar Node.js
 echo ℹ️  Verificando dependências do sistema...
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js não encontrado. Instale Node.js 18+ antes de continuar.
+    echo ❌ Node.js não encontrado. Instale Node.js 22.17.0+ antes de continuar.
     echo    Download: https://nodejs.org/
     pause
     exit /b 1
 )
 
+REM Obter versão completa do Node.js
 for /f "tokens=1 delims=v" %%i in ('node --version') do set NODE_VERSION=%%i
-for /f "tokens=1 delims=." %%i in ("%NODE_VERSION:~1%") do set NODE_MAJOR=%%i
-if %NODE_MAJOR% LSS 18 (
-    echo ❌ Node.js versão 18+ é necessária. Versão atual: %NODE_VERSION%
+echo ℹ️  Versão do Node.js detectada: v%NODE_VERSION%
+
+REM Extrair versão major, minor e patch
+for /f "tokens=1,2,3 delims=." %%a in ("%NODE_VERSION%") do (
+    set NODE_MAJOR=%%a
+    set NODE_MINOR=%%b
+    set NODE_PATCH=%%c
+)
+
+REM Verificar se é Node.js 22.17.0 ou superior
+set VERSION_OK=false
+
+REM Se major > 22, está OK
+if %NODE_MAJOR% GTR 22 (
+    set VERSION_OK=true
+)
+
+REM Se major = 22, verificar minor e patch
+if %NODE_MAJOR% EQU 22 (
+    if %NODE_MINOR% GTR 17 (
+        set VERSION_OK=true
+    )
+    if %NODE_MINOR% EQU 17 (
+        if %NODE_PATCH% GEQ 0 (
+            set VERSION_OK=true
+        )
+    )
+)
+
+REM Se major < 22, não está OK
+if %NODE_MAJOR% LSS 22 (
+    set VERSION_OK=false
+)
+
+if "%VERSION_OK%"=="false" (
+    echo ❌ Node.js versão 22.17.0+ é necessária. Versão atual: v%NODE_VERSION%
+    echo    Versão mínima requerida: v22.17.0
+    echo    Download: https://nodejs.org/
+    echo.
+    echo 💡 Dica: Baixe a versão LTS mais recente do Node.js
     pause
     exit /b 1
 )
 
-echo ✅ Node.js %NODE_VERSION% encontrado
+echo ✅ Node.js v%NODE_VERSION% encontrado (compatível)
 
 REM Verificar npm
 npm --version >nul 2>&1
@@ -86,6 +124,7 @@ echo ℹ️  Instalando dependências do projeto raiz...
 call npm install
 if errorlevel 1 (
     echo ❌ Erro ao instalar dependências do projeto raiz
+    echo 💡 Tente limpar o cache: npm cache clean --force
     pause
     exit /b 1
 )
@@ -97,6 +136,7 @@ cd backend
 call npm install
 if errorlevel 1 (
     echo ❌ Erro ao instalar dependências do backend
+    echo 💡 Tente limpar o cache: npm cache clean --force
     cd ..
     pause
     exit /b 1
@@ -119,6 +159,7 @@ if "%DOCKER_AVAILABLE%"=="true" if "%COMPOSE_AVAILABLE%"=="true" (
         docker-compose up -d postgres redis
         if errorlevel 1 (
             echo ❌ Erro ao iniciar containers
+            echo 💡 Verifique se o Docker Desktop está rodando
             pause
             exit /b 1
         )
@@ -131,6 +172,7 @@ if "%DOCKER_AVAILABLE%"=="true" if "%COMPOSE_AVAILABLE%"=="true" (
         docker-compose exec -T postgres psql -U treeinspector -d treeinspector < database/schema.sql
         if errorlevel 1 (
             echo ❌ Erro ao executar schema do banco
+            echo 💡 Verifique se o PostgreSQL está rodando corretamente
             pause
             exit /b 1
         )
@@ -216,7 +258,7 @@ if not errorlevel 1 (
 )
 
 echo.
-echo ✅ Setup concluído!
+echo ✅ Setup concluído com sucesso!
 echo.
 echo 📋 Próximos passos:
 echo   1. Edite o arquivo .env com suas configurações
@@ -233,6 +275,12 @@ echo.
 echo 📚 Documentação:
 echo   http://localhost:3000/api/docs  - Swagger API docs
 echo   http://localhost:3001           - Web dashboard
+echo.
+echo 🎯 Versões verificadas:
+echo   Node.js: v%NODE_VERSION% (✅ Compatível com 22.17.0+)
+echo   npm: %NPM_VERSION%
+if "%DOCKER_AVAILABLE%"=="true" echo   Docker: %DOCKER_VERSION%
+if "%COMPOSE_AVAILABLE%"=="true" echo   Docker Compose: %COMPOSE_VERSION%
 echo.
 echo ✅ TreeInspector está pronto para desenvolvimento! 🌳
 

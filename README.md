@@ -40,7 +40,7 @@ TreeInspector/
 
 ### Pré-requisitos
 
-- Node.js 18+
+- **Node.js 22.17.0+** (Download: https://nodejs.org/)
 - PostgreSQL 15+ com PostGIS
 - Redis
 - Docker e Docker Compose (opcional)
@@ -171,6 +171,37 @@ psql treeinspector < database/schema.sql
 
 ### Modelo Temporal
 
+O sistema implementa um modelo **bitemporal** que preserva:
+
+- **Tempo Válido**: Quando o fato era verdadeiro no mundo real
+- **Tempo de Transação**: Quando foi registrado no sistema
+
+### Principais Tabelas
+
+- `arvores` - Dados básicos das árvores
+- `especies` - Catálogo de espécies
+- `inspecoes` - Registros de inspeções
+- `dados_dendrometricos` - Medições temporais
+- `dados_fitossanitarios` - Estados de saúde temporais
+- `avaliacoes_risco` - Avaliações de risco temporais
+
+## 🔌 API REST
+
+### Endpoints Principais
+
+```
+POST   /api/auth/login              # Autenticação
+GET    /api/trees                   # Listar árvores
+POST   /api/inspections             # Nova inspeção
+POST   /api/species/identify        # Identificar espécie
+POST   /api/sync/upload             # Sincronizar dados
+GET    /api/reports/generate        # Gerar relatório
+```
+
+### Autenticação
+
+```bash
+# Login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "senha": "password"}'
@@ -248,6 +279,54 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-password
 ```
 
+## 🖥️ Comandos de Desenvolvimento
+
+### Windows
+```cmd
+REM Instalar todas as dependências
+npm run install:all
+
+REM Desenvolvimento
+npm run dev                 REM Backend + Web
+npm run dev:mobile          REM React Native Metro
+
+REM Docker
+docker-compose up -d        REM Todos os serviços
+docker-compose down         REM Parar serviços
+
+REM Testes
+npm run test               REM Todos os testes
+npm run lint               REM Verificar código
+
+REM Banco de dados
+npm run db:migrate         REM Executar migrações
+npm run db:seed           REM Popular dados
+npm run db:reset          REM Resetar banco
+```
+
+### Linux/macOS
+```bash
+# Instalar todas as dependências
+npm run install:all
+
+# Desenvolvimento
+npm run dev                 # Backend + Web
+npm run dev:mobile          # React Native Metro
+
+# Docker
+docker-compose up -d        # Todos os serviços
+docker-compose down         # Parar serviços
+
+# Testes
+npm run test               # Todos os testes
+npm run lint               # Verificar código
+
+# Banco de dados
+npm run db:migrate         # Executar migrações
+npm run db:seed           # Popular dados
+npm run db:reset          # Resetar banco
+```
+
 ## 📚 Documentação
 
 - [Arquitetura](./ARCHITECTURE.md) - Visão geral da arquitetura
@@ -271,6 +350,72 @@ SMTP_PASS=your-password
 - Conventional Commits para mensagens
 - Testes obrigatórios para novas features
 - Documentação atualizada
+
+## 🛠️ Solução de Problemas
+
+### Windows
+
+**Erro de permissão ao executar scripts:**
+```cmd
+# Execute como administrador ou configure o PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Erro com Docker no Windows:**
+```cmd
+# Certifique-se que o Docker Desktop está rodando
+# Habilite WSL2 se necessário
+```
+
+**Erro com Node.js/npm:**
+```cmd
+# Limpar cache do npm
+npm cache clean --force
+
+# Reinstalar node_modules
+rmdir /s node_modules
+npm install
+```
+
+**Versão do Node.js incorreta:**
+```cmd
+# Verifique a versão instalada
+node --version
+
+# Deve ser 22.17.0 ou superior
+# Download: https://nodejs.org/
+```
+
+### Linux/macOS
+
+**Erro de permissão:**
+```bash
+# Dar permissão ao script
+chmod +x scripts/setup.sh
+
+# Ou executar com bash
+bash scripts/setup.sh
+```
+
+**Erro com PostgreSQL:**
+```bash
+# Verificar se PostgreSQL está rodando
+sudo systemctl status postgresql
+
+# Instalar PostGIS
+sudo apt-get install postgresql-postgis
+```
+
+**Versão do Node.js incorreta:**
+```bash
+# Verificar versão
+node --version
+
+# Instalar Node.js 22.17.0+ via nvm (recomendado)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 22.17.0
+nvm use 22.17.0
+```
 
 ## 📄 Licença
 

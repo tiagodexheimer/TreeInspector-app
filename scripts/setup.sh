@@ -43,13 +43,15 @@ log_info "Verificando dependências do sistema..."
 
 # Node.js
 if ! command -v node &> /dev/null; then
-    log_error "Node.js não encontrado. Instale Node.js 18+ antes de continuar."
+    log_error "Node.js não encontrado. Instale Node.js 22.17.0+ antes de continuar."
+    log_error "Download: https://nodejs.org/"
     exit 1
 fi
 
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -lt 18 ]; then
-    log_error "Node.js versão 18+ é necessária. Versão atual: $(node -v)"
+if [ "$NODE_VERSION" -lt 22 ]; then
+    log_error "Node.js versão 22.17.0+ é necessária. Versão atual: $(node -v)"
+    log_error "Download: https://nodejs.org/"
     exit 1
 fi
 
