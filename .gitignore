@@ -1,0 +1,205 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Build outputs
+build/
+dist/
+out/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Uploads
+uploads/
+temp/
+
+# Backups
+backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# React Native
+mobile/android/app/build/
+mobile/ios/build/
+mobile/ios/Pods/
+mobile/ios/Podfile.lock
+mobile/android/.gradle/
+mobile/android/app/src/main/assets/index.android.bundle
+mobile/android/app/src/main/res/drawable-*
+mobile/metro.config.js.bak
+
+# React Native specific
+mobile/ios/TreeInspector.xcworkspace/
+mobile/ios/TreeInspector.xcodeproj/xcuserdata/
+mobile/ios/TreeInspector.xcodeproj/project.xcworkspace/xcuserdata/
+mobile/android/app/src/main/assets/index.android.bundle
+mobile/android/app/src/main/assets/index.android.map
+
+# Flipper
+mobile/ios/Pods/Flipper*
+mobile/ios/Pods/boost-for-react-native
+
+# CocoaPods
+mobile/ios/Pods/
+mobile/ios/Podfile.lock
+
+# Gradle
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+
+# Buck
+mobile/buck-out/
+mobile/.buckd/
+mobile/*.keystore
+mobile/!debug.keystore
+
+# Fastlane
+mobile/ios/fastlane/report.xml
+mobile/ios/fastlane/Preview.html
+mobile/ios/fastlane/screenshots
+mobile/ios/fastlane/test_output
+mobile/android/fastlane/report.xml
+mobile/android/fastlane/Preview.html
+mobile/android/fastlane/screenshots
+mobile/android/fastlane/test_output
+
+# Bundle artifacts
+mobile/*.jsbundle
+
+# Web build
+web/build/
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+
+# Backend specific
+backend/uploads/
+backend/logs/
+backend/temp/
+
+# Docker
+.dockerignore
+
+# Testing
+coverage/
+.nyc_output/
+cypress/videos/
+cypress/screenshots/
+
+# Misc
+*.tgz
+*.tar.gz
+.cache/
+.temp/
+.tmp/
+
+# Documentation build
+docs/_build/
+docs/.doctrees/
+
+# Certificates
+*.pem
+*.key
+*.crt
+*.p12
+
+# Local development
+.local/
+.vscode/settings.json

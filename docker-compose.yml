@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  # PostgreSQL com PostGIS
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: treeinspector-postgres
+    environment:
+      POSTGRES_DB: treeinspector
+      POSTGRES_USER: treeinspector
+      POSTGRES_PASSWORD: treeinspector123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - treeinspector-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U treeinspector -d treeinspector"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis para cache e sessões
+  redis:
+    image: redis:7-alpine
+    container_name: treeinspector-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - treeinspector-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: treeinspector-backend
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://treeinspector:treeinspector123@postgres:5432/treeinspector
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 24h
+      PLANTNET_API_KEY: ${PLANTNET_API_KEY}
+      GBIF_API_URL: https://api.gbif.org/v1
+      UPLOAD_PATH: ./uploads
+      MAX_FILE_SIZE: 10485760
+      CORS_ORIGIN: http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - treeinspector-network
+    command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Web Dashboard
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: treeinspector-web
+    environment:
+      REACT_APP_API_URL: http://localhost:3000/api
+      REACT_APP_MAPBOX_TOKEN: ${MAPBOX_TOKEN}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - treeinspector-network
+    command: npm start
+
+  # PgAdmin para administração do banco (opcional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: treeinspector-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@treeinspector.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - treeinspector-network
+    profiles:
+      - admin
+
+  # Redis Commander para administração do Redis (opcional)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: treeinspector-redis-commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - treeinspector-network
+    profiles:
+      - admin
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_uploads:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  treeinspector-network:
+    driver: bridge
