@@ -18,7 +18,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "18.3.1",
+    "react": "18.2.0",
     "react-native": "0.73.2",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
@@ -30,9 +30,9 @@
     "react-native-reanimated": "^3.6.2",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "react-native-sqlite-storage": "^6.0.1",
-    "@react-native-camera/camera": "^7.1.2",
+    "react-native-vision-camera": "^3.6.17",
     "react-native-image-picker": "^7.1.0",
-    "react-native-image-resizer": "^3.0.8",
+    "react-native-image-resizer": "^1.4.5",
     "@react-native-community/geolocation": "^3.2.1",
     "react-native-permissions": "^4.1.5",
     "react-native-maps": "^1.10.0",
@@ -63,12 +63,11 @@
     "react-native-splash-screen": "^3.3.0",
     "react-native-orientation-locker": "^1.7.0",
     "react-native-keep-awake": "^4.0.0",
-    "react-native-background-job": "^0.2.2",
-    "react-native-background-sync": "^1.0.1",
+    "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/netinfo": "^11.2.1",
     "react-native-uuid": "^2.0.2",
     "react-native-qrcode-scanner": "^1.5.5",
-    "react-native-barcode-builder": "^2.0.2"
+    "react-native-svg": "^13.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
