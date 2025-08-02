@@ -6,6 +6,19 @@ Uma plataforma completa de inspeção de árvores com arquitetura Mobile First, 
 
 O TreeInspector é uma solução integrada que combina uma aplicação móvel para coleta de dados em campo com um dashboard web para análise e gestão. O sistema foi projetado com foco na funcionalidade offline e no rastreamento histórico temporal de dados.
 
+### ✨ Novidades da Versão Atual
+
+**🔬 APIs Externas Integradas**
+- **Pl@ntNet**: Identificação automática de espécies por fotos
+- **GBIF**: Base científica global de biodiversidade
+- **Geocoding**: Obtenção automática de endereços
+
+**⚠️ Motor de Avaliação de Risco ABNT**
+- Matriz de risco 5x5 conforme NBR 16246-3
+- Cálculo automático de probabilidade e consequência
+- Recomendações específicas por nível de risco
+- Cronograma automático de próximas inspeções
+
 ### Principais Funcionalidades
 
 - **📱 App Móvel React Native**: Coleta de dados offline com sincronização automática
@@ -30,11 +43,12 @@ TreeInspector/
 ### Stack Tecnológica
 
 - **Mobile**: React Native + SQLite + Redux Toolkit
-- **Backend**: Node.js + Express + PostgreSQL + PostGIS
+- **Backend**: Node.js + Express + PostgreSQL + PostGIS + Multer + Axios
 - **Web**: React + Material-UI + Mapbox + Recharts
 - **Database**: PostgreSQL 15+ com PostGIS
 - **Cache**: Redis
 - **Deploy**: Docker + Docker Compose
+- **APIs Externas**: Pl@ntNet, GBIF
 
 ## 🚀 Quick Start
 
@@ -82,12 +96,25 @@ cp .env.example .env
 # Edite o arquivo .env com suas configurações
 ```
 
-3. **Inicie os serviços com Docker**
+3. **Configure APIs externas**
+```env
+# PlantNet API
+PLANTNET_API_KEY=sua-chave-plantnet
+PLANTNET_API_URL=https://my-api.plantnet.org/v1/identify
+
+# GBIF API (sem chave necessária)
+GBIF_API_URL=https://api.gbif.org/v1
+
+# Mapbox (para frontend)
+NEXT_PUBLIC_MAPBOX_TOKEN=seu-token-mapbox
+```
+
+4. **Inicie os serviços com Docker**
 ```bash
 docker-compose up -d
 ```
 
-4. **Ou configure manualmente:**
+5. **Ou configure manualmente:**
 
 ```bash
 # Backend
@@ -160,6 +187,8 @@ psql treeinspector < database/schema.sql
 - 📈 **Análise Temporal**: Evolução da saúde das árvores
 - 📄 **Relatórios**: Geração personalizada de documentos
 - 👥 **Multiusuário**: Controle de acesso por papéis
+- 🌿 **Identificação de Espécies**: Interface para Pl@ntNet
+- ⚠️ **Avaliação de Risco**: Visualização da matriz ABNT
 
 ### Tipos de Usuário
 
@@ -190,10 +219,21 @@ O sistema implementa um modelo **bitemporal** que preserva:
 ### Endpoints Principais
 
 ```
+# Autenticação
 POST   /api/auth/login              # Autenticação
+
+# Árvores
 GET    /api/trees                   # Listar árvores
 POST   /api/inspections             # Nova inspeção
-POST   /api/species/identify        # Identificar espécie
+
+# Espécies (APIs Externas)
+POST   /api/v1/species/identify     # Identificar espécie (Pl@ntNet)
+GET    /api/v1/species/search       # Buscar espécie (GBIF)
+GET    /api/v1/species/:id          # Detalhes da espécie
+GET    /api/v1/species/location     # Espécies por localização
+GET    /api/v1/species/status       # Status das APIs
+
+# Sincronização e Relatórios
 POST   /api/sync/upload             # Sincronizar dados
 GET    /api/reports/generate        # Gerar relatório
 ```
@@ -210,6 +250,78 @@ curl -X POST http://localhost:3000/api/auth/login \
 curl -H "Authorization: Bearer <token>" \
   http://localhost:3000/api/trees
 ```
+
+## 🌿 Integração com APIs Externas
+
+### Pl@ntNet API
+
+```javascript
+// Identificação por fotos
+POST /api/v1/species/identify
+Content-Type: multipart/form-data
+
+{
+  images: [File, File, ...],
+  organs: ['leaf', 'flower', 'bark'],
+  project: 'weurope',
+  maxResults: 10
+}
+```
+
+**Órgãos suportados:**
+- `leaf` - Folhas
+- `flower` - Flores
+- `fruit` - Frutos
+- `bark` - Casca
+- `habit` - Hábito geral
+- `other` - Outros
+
+### GBIF API
+
+```javascript
+// Busca por nome científico
+GET /api/v1/species/search?q=Cecropia+pachystachya
+
+// Detalhes da espécie
+GET /api/v1/species/2878688
+
+// Ocorrências por localização
+GET /api/v1/species/location?latitude=-23.5505&longitude=-46.6333&radius=10
+```
+
+## ⚠️ Avaliação de Risco ABNT NBR 16246-3
+
+### Matriz de Risco Implementada
+
+```
+Probabilidade vs Consequência (1-5)
+    1  2  3  4  5
+1 | 1  1  2  2  3 |
+2 | 1  2  2  3  4 |
+3 | 2  2  3  4  4 |
+4 | 2  3  4  4  5 |
+5 | 3  4  4  5  5 |
+```
+
+### Fatores de Avaliação
+
+**Probabilidade:**
+- Condição estrutural (tronco, raízes, copa, galhos)
+- Fatores biológicos (pragas, doenças)
+- Fatores ambientais (exposição ao vento, solo)
+
+**Consequência:**
+- Alvos potenciais (pessoas, veículos, propriedades)
+- Intensidade de uso da área
+- Valor dos bens expostos
+
+### Recomendações Automáticas
+
+- **Risco 5**: Remoção imediata (24h)
+- **Risco 4**: Intervenção prioritária (1-2 semanas)
+- **Risco 3**: Intervenção programada (1-3 meses)
+- **Risco 2**: Monitoramento periódico (6 meses)
+- **Risco 1**: Monitoramento de rotina (12 meses)
 
 ## 🧪 Testes
 
@@ -267,6 +379,7 @@ JWT_EXPIRES_IN=24h
 
 # APIs Externas
 PLANTNET_API_KEY=your-plantnet-key
+PLANTNET_API_URL=https://my-api.plantnet.org/v1/identify
 GBIF_API_URL=https://api.gbif.org/v1
 
 # Upload
@@ -326,6 +439,28 @@ npm run db:migrate         # Executar migrações
 npm run db:seed           # Popular dados
 npm run db:reset          # Resetar banco
 ```
+
+## 📊 Status do Projeto
+
+### ✅ Fases Concluídas
+1. **Estrutura inicial** - Repositórios e configuração
+2. **Banco PostgreSQL** - PostGIS e modelo temporal
+3. **API REST** - Node.js/Express completa
+4. **Autenticação** - JWT e middleware de segurança
+5. **App Mobile** - React Native com SQLite offline
+6. **Web Dashboard** - React com Material-UI
+7. **Coleta Offline** - Sistema completo de dados offline
+8. **GPS e Câmera** - Geolocalização e captura de fotos
+9. **APIs Externas** - Pl@ntNet e GBIF integradas ✅
+10. **Avaliação ABNT** - Motor de risco NBR 16246-3 ✅
+
+### 🔄 Próximas Fases
+- **Sincronização** - Sistema bidirecional robusto
+- **Relatórios PDF** - Geração automática de documentos
+- **Analytics** - Gráficos e análises históricas
+- **Multiusuário** - Gestão avançada de permissões
+- **Testes** - Cobertura completa automatizada
+- **Deploy** - Ambiente de produção
 
 ## 📚 Documentação
 
@@ -417,6 +552,16 @@ nvm install 22.17.0
 nvm use 22.17.0
 ```
 
+**Erro com APIs externas:**
+```bash
+# Verificar conectividade
+curl -I https://my-api.plantnet.org/v1/identify
+curl -I https://api.gbif.org/v1
+
+# Verificar chave da API
+echo $PLANTNET_API_KEY
+```
+
 ## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
@@ -442,7 +587,19 @@ Desenvolvido com base nas especificações do documento "Projeto de Software: Tr
 - [Material-UI](https://mui.com/) - Componentes React
 - [Mapbox](https://www.mapbox.com/) - Mapas interativos
 - [Pl@ntNet](https://plantnet.org/) - API de identificação de plantas
+- [GBIF](https://www.gbif.org/) - Base global de biodiversidade
+
+### Reconhecimentos
+
+- **ABNT NBR 16246-3**: Metodologia de avaliação de risco
+- **Pl@ntNet**: API de identificação de plantas
+- **GBIF**: Base de dados de biodiversidade
+- **OpenStreetMap**: Dados cartográficos
+- **Comunidade Open Source**: Bibliotecas e ferramentas utilizadas
 
 ---
 
 **TreeInspector** - Transformando a gestão de árvores urbanas através da tecnologia 🌳📱
+
+**Versão Atual**: 2.0.0 - APIs Externas e Avaliação de Risco ABNT  
+**Última Atualização**: Janeiro 2025
