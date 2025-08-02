@@ -67,6 +67,10 @@ async function connectRedis() {
     return redisClient;
   } catch (error) {
     logger.error('Redis: Erro ao conectar:', error);
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('⚠️  Modo desenvolvimento: Continuando sem Redis');
+      return null; // Permite continuar em desenvolvimento
+    }
     throw error;
   }
 }

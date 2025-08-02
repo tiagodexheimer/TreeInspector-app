@@ -1,4 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'development' ? '.env.development' : '.env'
+});
 const { Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
 
@@ -48,6 +50,10 @@ async function testConnection() {
         return true;
     } catch (error) {
         logger.error('❌ Erro ao conectar com PostgreSQL:', error);
+        if (process.env.NODE_ENV === 'development') {
+            logger.warn('⚠️  Modo desenvolvimento: Continuando sem PostgreSQL');
+            return true; // Permite continuar em desenvolvimento
+        }
         return false;
     }
 }
